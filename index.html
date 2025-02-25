@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>META-MORTIS</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeOut 3s forwards;
+        }
+        #intro-screen h1 {
+            font-size: 48px;
+            animation: slideIn 1s ease-out;
+        }
+        #intro-screen p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; display: none; }
+        }
+        #menu {
+            width: 100%;
+            height: 100vh;
+            background: url('https://i.ibb.co/bMVpzBbN/photo-2025-02-23-16-14-17.jpg') center/cover no-repeat;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #game-container {
+            width: 900px;
+            text-align: center;
+            display: none;
+            background: #000;
+        }
+        #game {
+            width: 900px;
+            height: 600px;
+            position: relative;
+            background: url('https://i.ibb.co/zWP11FMy/8-Qfm-N4-Igo2cc1e-Jk-1.png') center/cover;
+            border: 2px solid #000;
+        }
+        #player {
+            width: 80px;
+            height: 100px;
+            background: url('https://i.ibb.co/jvfH9CND/004-Epic-Punk-Photoroom-2.png') center/cover;
+            position: absolute;
+            bottom: 0;
+            left: 410px;
+            z-index: 10;
+        }
+        .box {
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            background-size: cover;
+            z-index: 5;
+        }
+        .good { background: url('https://i.ibb.co/m5fryVPr/011-Platinium-Crystal-Photoroom.png') center/cover; }
+        .bad { background: url('https://i.ibb.co/4nZ2MQH7/013-Platinum-Cyborg-Photoroom.png') center/cover; }
+        .bonus { background: url('https://i.ibb.co/gMr2y1Bf/008-Platinum-Key-Photoroom.png') center/cover; }
+        .life { background: url('https://i.ibb.co/c5DmVFh/029-Gold-Eros-Photoroom.png') center/cover; }
+        .hit { transform: scale(1.5); opacity: 0; transition: transform 0.1s, opacity 0.1s; }
+        .feedback {
+            position: absolute;
+            color: white;
+            font-size: 20px;
+            z-index: 15;
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        #info {
+            font-size: 24px;
+            margin: 10px;
+            color: white;
+        }
+        #controls {
+            margin: 10px;
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 20;
+            text-align: center;
+        }
+        #leaderboard {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+            background: url('https://i.ibb.co/4ZzLhvXc/photo-2025-02-23-16-14-17-Photoroom.jpg') center/cover no-repeat;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        #how-to-play {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            text-align: center;
+            background: url('https://i.ibb.co/WWkD3RCF/photo-2025-02-23-16-14-17-Photoroom-1.jpg') center/cover no-repeat;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 5px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #4B0082, #6A0DAD);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, background 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(45deg, #6A0DAD, #4B0082);
+        }
+        button:active {
+            transform: scale(0.95);
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #4B0082;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        @media (max-width: 900px) {
+            #menu, #game-container, #game, #leaderboard, #how-to-play { width: 100%; }
+            #game { height: 70vh; }
+            #player { width: 60px; height: 75px; }
+            .box { width: 20px; height: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="intro-screen">
+        <h1>META-MORTIS</h1>
+        <p>Created and Designed by Gork</p>
+    </div>
+    <div id="menu">
+        <h1>META-MORTIS</h1>
+        <input type="text" id="username" placeholder="Enter Username" maxlength="20">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="showLeaderboard()">Leaderboard</button>
+        <button onclick="showHowToPlay()">How to Play</button>
+        <button id="sound-toggle" onclick="toggleSound()">Sound On</button>
+    </div>
+    <div id="game-container">
+        <div id="info">Score: <span id="score">0</span> | Lives: <span id="lives">3</span></div>
+        <div id="controls">
+            <button id="sound-toggle-game" onclick="toggleSound()">Sound On</button>
+            <button onclick="backToMenuFromGame()">Back to Main Menu</button>
+        </div>
+        <div id="game">
+            <div id="player"></div>
+            <div id="game-over">
+                <h2>Game Over!</h2>
+                <p>Your Score: <span id="final-score">0</span></p>
+                <button onclick="restartGame()">Restart</button>
+            </div>
+        </div>
+    </div>
+    <div id="leaderboard">
+        <h2>Leaderboard</h2>
+        <p>Special rewards for the Top 10 players!</p>
+        <ul id="leaderboard-list"></ul>
+        <button onclick="backToMenu()">Return to Menu</button>
+    </div>
+    <div id="how-to-play">
+        <h2>How to Play</h2>
+        <p>Welcome to META-MORTIS! Control your character using the left and right arrow keys or swipe on mobile to catch falling boxes. Here's what each box does:</p>
+        <ul style="text-align: left; display: inline-block;">
+            <li><strong>Green Crystal (Good Box):</strong> Adds 5 points to your score.</li>
+            <li><strong>Cyber Bomb (Bad Box):</strong> Subtracts 10 points and reduces 1 life.</li>
+            <li><strong>Treasure Chest (Bonus Box):</strong> Grants 20 bonus points.</li>
+            <li><strong>HP Gift (Life Box):</strong> Increases your life by 1.</li>
+        </ul>
+        <p>Every 5 boxes you catch, the speed of falling boxes increases slightly. Avoid losing all your lives to keep playing! Your highest score will be saved on the leaderboard.</p>
+        <button onclick="backToMenu()">Return to Menu</button>
+    </div>
+    <!-- Güncellenmiş ve Çalışan Ses Dosyaları -->
+    <audio id="background-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+    </audio>
+    <audio id="good-sound">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2569/2569-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="bad-sound">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2894/2894-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="bonus-sound">
+        <source src="https://assets.mixkit.co/active_storage/sfx/234/234-preview.mp3" type="audio/mp3">
+    </audio>
+    <audio id="life-sound">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2588/2588-preview.mp3" type="audio/mp3">
+    </audio>
+    <script>
+        const gameContainer = document.getElementById('game-container');
+        const game = document.getElementById('game');
+        const player = document.getElementById('player');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const leaderboard = document.getElementById('leaderboard');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const menu = document.getElementById('menu');
+        const howToPlay = document.getElementById('how-to-play');
+        const soundToggle = document.getElementById('sound-toggle');
+        const soundToggleGame = document.getElementById('sound-toggle-game');
+        const music = document.getElementById('background-music');
+        const goodSound = document.getElementById('good-sound');
+        const badSound = document.getElementById('bad-sound');
+        const bonusSound = document.getElementById('bonus-sound');
+        const lifeSound = document.getElementById('life-sound');
+        const usernameInput = document.getElementById('username');
+
+        let score = 0;
+        let lives = 3;
+        let playerX = 410;
+        let speed = 1;
+        let caughtBoxes = 0;
+        let gameActive = false;
+        let boxes = [];
+        let lastTime = 0;
+        let nextSpawnTime = 0;
+        let spawnMin = 0.3;
+        let spawnMax = 1.0;
+
+        // Seslerin yüklendiğinden emin olmak için
+        function preloadSounds() {
+            goodSound.load();
+            badSound.load();
+            bonusSound.load();
+            lifeSound.load();
+            music.load();
+        }
+        window.addEventListener('load', preloadSounds);
+
+        function gameLoop(timestamp) {
+            if (!gameActive) return;
+            if (!lastTime) lastTime = timestamp;
+            const delta = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
+
+            nextSpawnTime -= delta;
+            if (nextSpawnTime <= 0 && boxes.length < 30) {
+                createBox();
+                nextSpawnTime = Math.random() * (spawnMax - spawnMin) + spawnMin;
+            }
+
+            let boxesToRemove = [];
+            for (let i = 0; i < boxes.length; i++) {
+                const box = boxes[i];
+                box.y += speed * delta * 60;
+                box.element.style.top = box.y + 'px';
+
+                const boxLeft = parseInt(box.element.style.left);
+                const boxBottom = box.y + 30;
+                const playerTop = 600 - 100;
+
+                if (boxBottom > playerTop && box.y < 600 && boxLeft + 30 > playerX && boxLeft < playerX + 80 && !box.isCaught) {
+                    handleCollision(box, i, boxesToRemove);
+                } else if (box.y > 600) {
+                    boxesToRemove.push(i);
+                }
+            }
+
+            boxesToRemove.sort((a, b) => b - a);
+            boxesToRemove.forEach(index => {
+                if (index >= 0 && index < boxes.length) {
+                    boxes[index].element.remove();
+                    boxes.splice(index, 1);
+                }
+            });
+
+            updateInfo();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function createBox() {
+            const box = document.createElement('div');
+            box.className = 'box';
+            const type = Math.random();
+            if (type < 0.32) box.classList.add('good');
+            else if (type < 0.93) box.classList.add('bad');
+            else if (type < 0.98) box.classList.add('bonus');
+            else box.classList.add('life');
+
+            const x = Math.random() * (900 - 30);
+            box.style.left = x + 'px';
+            box.style.top = '0px';
+            game.appendChild(box);
+
+            boxes.push({ element: box, x, y: 0, isCaught: false });
+        }
+
+        function handleCollision(box, index, boxesToRemove) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.style.left = box.element.style.left;
+            feedback.style.top = box.element.style.top;
+            game.appendChild(feedback);
+
+            caughtBoxes++;
+
+            if (box.element.classList.contains('good')) {
+                score += 5;
+                feedback.textContent = '+5';
+                if (isSoundOn) {
+                    goodSound.currentTime = 0;
+                    goodSound.play().catch(e => console.error('Good sound failed:', e));
+                }
+            } else if (box.element.classList.contains('bad')) {
+                score -= 10;
+                lives--;
+                feedback.textContent = '-10';
+                if (isSoundOn) {
+                    badSound.currentTime = 0;
+                    badSound.play().catch(e => console.error('Bad sound failed:', e));
+                }
+            } else if (box.element.classList.contains('bonus')) {
+                score += 20;
+                feedback.textContent = '+20';
+                if (isSoundOn) {
+                    bonusSound.currentTime = 0;
+                    bonusSound.play().catch(e => console.error('Bonus sound failed:', e));
+                }
+            } else if (box.element.classList.contains('life')) {
+                lives++;
+                feedback.textContent = '+1 Life';
+                if (isSoundOn) {
+                    lifeSound.currentTime = 0;
+                    lifeSound.play().catch(e => console.error('Life sound failed:', e));
+                }
+            }
+
+            box.element.classList.add('hit');
+            feedback.style.transform = 'translateY(-20px)';
+            feedback.style.opacity = '0';
+            box.isCaught = true;
+
+            setTimeout(() => {
+                feedback.remove();
+                boxesToRemove.push(index);
+            }, 500);
+        }
+
+        function updateInfo() {
+            if (score < 0) score = 0;
+            scoreDisplay.textContent = score;
+            livesDisplay.textContent = lives;
+            if (lives <= 0) endGame();
+            speed = Math.min(5, 1 + Math.floor(caughtBoxes / 5) * 0.5);
+            spawnMin = Math.max(0.1, 0.3 - Math.floor(caughtBoxes / 10) * 0.1);
+            spawnMax = Math.max(0.3, 1.0 - Math.floor(caughtBoxes / 10) * 0.1);
+        }
+
+        function startGame() {
+            const username = usernameInput.value.trim();
+            if (username.length === 0) {
+                alert('Please enter a valid username!');
+                return;
+            }
+            menu.style.display = 'none';
+            gameContainer.style.display = 'block';
+            gameActive = true;
+            score = 0;
+            lives = 3;
+            speed = 1;
+            caughtBoxes = 0;
+            playerX = 410;
+            player.style.left = playerX + 'px';
+            boxes.forEach(b => b.element.remove());
+            boxes = [];
+            nextSpawnTime = 0;
+            spawnMin = 0.3;
+            spawnMax = 1.0;
+            updateInfo();
+            if (isSoundOn) music.play().catch(e => console.error('Music failed:', e));
+            updateSoundButtons();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function restartGame() {
+            gameOverScreen.style.display = 'none';
+            boxes.forEach(b => b.element.remove());
+            boxes = [];
+            caughtBoxes = 0;
+            startGame();
+        }
+
+        function backToMenuFromGame() {
+            gameActive = false;
+            gameContainer.style.display = 'none';
+            menu.style.display = 'block';
+            boxes.forEach(b => b.element.remove());
+            boxes = [];
+            music.pause();
+        }
+
+        function endGame() {
+            gameActive = false;
+            finalScoreDisplay.textContent = score;
+            gameOverScreen.style.display = 'block';
+            saveScore(usernameInput.value.trim(), score);
+            music.pause();
+        }
+
+        function saveScore(username, score) {
+            try {
+                let scores = JSON.parse(localStorage.getItem('scores')) || [];
+                const existingPlayer = scores.find(entry => entry.username === username);
+                if (existingPlayer) {
+                    if (score > existingPlayer.score) {
+                        existingPlayer.score = score;
+                        existingPlayer.date = new Date().toLocaleString();
+                    }
+                } else {
+                    scores.push({ username, score, date: new Date().toLocaleString() });
+                }
+                scores.sort((a, b) => b.score - a.score);
+                localStorage.setItem('scores', JSON.stringify(scores));
+            } catch (e) {
+                console.error('Failed to save score:', e);
+            }
+        }
+
+        function showLeaderboard() {
+            menu.style.display = 'none';
+            gameContainer.style.display = 'none';
+            leaderboard.style.display = 'block';
+            leaderboardList.innerHTML = '';
+            try {
+                const scores = JSON.parse(localStorage.getItem('scores')) || [];
+                scores.forEach((entry, i) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${i + 1}. ${entry.username}: ${entry.score} (${entry.date})`;
+                    leaderboardList.appendChild(li);
+                });
+            } catch (e) {
+                console.error('Failed to load leaderboard:', e);
+            }
+        }
+
+        function showHowToPlay() {
+            menu.style.display = 'none';
+            howToPlay.style.display = 'block';
+        }
+
+        function backToMenu() {
+            leaderboard.style.display = 'none';
+            howToPlay.style.display = 'none';
+            menu.style.display = 'block';
+        }
+
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            updateSoundButtons();
+            if (isSoundOn) music.play().catch(e => console.error('Sound play failed:', e));
+            else music.pause();
+        }
+
+        function updateSoundButtons() {
+            soundToggle.textContent = isSoundOn ? 'Sound Off' : 'Sound On';
+            soundToggleGame.textContent = isSoundOn ? 'Sound Off' : 'Sound On';
+        }
+
+        let isSoundOn = true;
+
+        document.addEventListener('keydown', (e) => {
+            if (!gameActive) return;
+            if (e.key === 'ArrowLeft' && playerX > 0) {
+                playerX -= 40;
+                player.style.left = playerX + 'px';
+            }
+            if (e.key === 'ArrowRight' && playerX < 820) {
+                playerX += 40;
+                player.style.left = playerX + 'px';
+            }
+        });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', (e) => {
+            if (!gameActive) return;
+            touchStartX = e.touches[0].clientX;
+        });
+        document.addEventListener('touchmove', (e) => {
+            if (!gameActive) return;
+            const touchX = e.touches[0].clientX;
+            const deltaX = (touchX - touchStartX) * 0.5;
+            playerX = Math.max(0, Math.min(820, playerX + deltaX));
+            player.style.left = playerX + 'px';
+            touchStartX = touchX;
+        });
+    </script>
+</body>
+</html>
